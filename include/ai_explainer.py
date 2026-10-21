@@ -5,16 +5,15 @@ LangGraph agent that reads a GX validation summary and generates:
   1. A plain-English root cause explanation
   2. A stakeholder-friendly Slack alert message
 
-Uses Azure OpenAI (gpt-5.4-mini) via Airflow Variables:
-  AZURE_OPENAI_API_KEY
-  AZURE_OPENAI_ENDPOINT
-  AZURE_OPENAI_DEPLOYMENT
+Uses NVIDIA's OpenAI-compatible API via Airflow Variables:
+  NVIDIA_API_KEY
+  NVIDIA_MODEL (optional; defaults to meta/llama-3.3-70b-instruct)
 
 Falls back to rule-based template if keys are not set (safe for demo).
 """
 
-import os
 import json
+from importlib import import_module
 from typing import TypedDict
 from langgraph.graph import StateGraph, END
 
@@ -31,24 +30,25 @@ class AlertState(TypedDict):
 
 
 def _get_llm(temperature: float = 0):
-    """Returns Azure OpenAI LLM if credentials are available, else None."""
+    """Returns the NVIDIA-hosted LLM if credentials are available, else None."""
     try:
-        from airflow.models import Variable
-        api_key   = Variable.get("AZURE_OPENAI_API_KEY", default_var=None)
-        endpoint  = Variable.get("AZURE_OPENAI_ENDPOINT", default_var=None)
-        deployment = Variable.get("AZURE_OPENAI_DEPLOYMENT", default_var="gpt-5.4-mini")
+        Variable = import_module("airflow.sdk").Variable
+        api_key = Variable.get("NVIDIA_API_KEY", default=None)
+        model = Variable.get(
+            "NVIDIA_MODEL",
+            default="meta/llama-3.3-70b-instruct",
+        )
     except Exception:
-        api_key = endpoint = deployment = None
+        api_key = model = None
 
-    if not api_key or not endpoint:
+    if not api_key:
         return None
 
-    from langchain_openai import AzureChatOpenAI
-    return AzureChatOpenAI(
-        azure_deployment=deployment,
-        azure_endpoint=endpoint,
+    from langchain_openai import ChatOpenAI
+    return ChatOpenAI(
+        model=model,
+        base_url="https://integrate.api.nvidia.com/v1",
         api_key=api_key,
-        api_version="2024-08-01-preview",
         temperature=temperature,
     )
 

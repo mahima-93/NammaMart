@@ -51,6 +51,13 @@ Go to `http://localhost:8080` — default login is `admin` / `admin`.
 **8. Confirm the DAG is registered**
 You should see `meridian_pipeline` in the DAGs list, unpaused, with no import errors. If there's an import error, check the requirements.txt packages installed correctly (`astro dev restart` after editing requirements.txt).
 
+**Optional: enable NVIDIA AI-generated data quality alerts**
+1. Create an API key in NVIDIA's API Catalog.
+2. In Airflow, open **Admin → Variables** and add `NVIDIA_API_KEY` with the key value.
+3. Optionally add `NVIDIA_MODEL` with a model currently available to your NVIDIA API key. If omitted, the code uses `meta/llama-3.3-70b-instruct`.
+
+The NVIDIA API Catalog's free access is subject to model availability and rate limits. If `NVIDIA_API_KEY` is not configured, the pipeline uses its built-in rule-based alert text.
+
 **9. Do one full dry run before class**
 Trigger it manually from the UI (the ▶ play button) or:
 ```

@@ -23,7 +23,7 @@ def send_slack_alert(message: str, webhook_url: str = None) -> bool:
     url = webhook_url or os.getenv("SLACK_WEBHOOK_URL")
 
     if not url:
-        print("[Slack] No SLACK_WEBHOOK_URL set. Printing alert to console instead:")
+        print("[Slack] No  set. Printing alert to console instead:")
         print("=" * 60)
         print(message)
         print("=" * 60)

@@ -127,12 +127,12 @@ def meridian_pipeline():
 
     @task
     def slack_alert(message: str):
-        from airflow.models import Variable
+        from airflow.sdk import Variable
         from slack_notifier import send_slack_alert
         if not message:
             print("[Slack] No failures to report.")
             return
-        webhook_url = Variable.get("SLACK_WEBHOOK_URL", default_var=None)
+        webhook_url = Variable.get("SLACK_WEBHOOK_URL", default=None)
         send_slack_alert(message, webhook_url=webhook_url)
 
     # ── TRANSFORM: only clean/passed rows ────────────────────────────────────
