@@ -32,7 +32,7 @@ import duckdb
 import json
 
 DATA_DIR       = "/usr/local/airflow/include/data"
-WAREHOUSE_DB   = "/usr/local/airflow/include/warehouse.duckdb"
+WAREHOUSE_DB   = "/usr/local/airflow/include/warehouse_mahima_dalvi.duckdb"
 QUARANTINE_DIR = "/usr/local/airflow/include/quarantine"
 
 default_args = {
